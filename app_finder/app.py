@@ -1,25 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from Conector import conectors
 
 app = Flask(__name__)   
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://Ivanovichleo:FinderCard59:@Ivanovichleo.mysql.pythonanywhere-services.com/Finderbd'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+host="Ivanovichleo.mysql.pythonanywhere-services.com"
+user="Ivanovichleo"
+password="Findercard59"
 
-# modelos de usuarios
-class Room(db.Model):
-    
-    id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(80), unique=True, nullable=False)
-    
-    def __repr__(self):
-        return f'<User {self.username}>'
-
-
+clientdb=conectors(host,user,password)
 
 # enroutamiento
 @app.route('/')
@@ -38,10 +29,9 @@ def login():
         # Por ejemplo, podrías redirigir a diferentes páginas dependiendo de la acción seleccionada
 
         if create_room:
-            New_room=Room(code=room_code)
-            db.session.add(New_room)
-            db.session.commit()
-            # db.session.add(,)
+            
+            clientdb.insert_room(room_code)
+
             return f'Crear sala para {username} con el código {room_code}'
         elif join_room:
             return f'{username} se unirá a la sala con el código {room_code}'
